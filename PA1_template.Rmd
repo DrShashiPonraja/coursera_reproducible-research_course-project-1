@@ -1,0 +1,78 @@
+---
+title: "Reproducible Research Project 1"
+author: "Shashi Ponraja"
+date: "17/03/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source ('import_data.R')
+library(chron)
+library (ggplot2)
+
+```
+
+
+This is an analysis of steps taken throughout the day, separated by 5 minute time intervals. It was collected between `r min(as.character(activity_data$date))` and `r max(as.character(activity_data$date))`
+
+
+## Total Number of Steps Taken Per Day
+
+
+```{r, echo=FALSE}
+TotalStepsByDate = aggregate(steps ~ date,data = activity_data, FUN=sum)
+hist(TotalStepsByDate$steps, main ='Histogram of steps per day', xlab = 'Steps per day')
+
+```
+
+The mean number of steps taken per day is `r format(mean(TotalStepsByDate$steps),scientific=F)` and the median number of steps is `r median(TotalStepsByDate$steps)`
+
+## Average Daily Activity Pattern
+
+```{r, echo=FALSE}
+AverageStepsByInterval = aggregate(steps ~ interval, data = activity_data, FUN = mean)
+plot(AverageStepsByInterval$interval, AverageStepsByInterval$steps, type="l", xlab = '24hour time', ylab = 'steps taken', main = 'Average steps taken during the day')
+```
+
+On average, the `r AverageStepsByInterval[which.max(AverageStepsByInterval$steps),'interval',]` contains the highest amount of steps
+
+
+For fun, we decided to fill in all the intervals where steps weren't recorded. We used the median amount of steps for that interval to fill in missing data. This changes our dataset somewhat.
+
+
+```{r, echo=FALSE}
+activity_data_noNAs = activity_data
+MedianStepsByInterval = aggregate(steps ~ interval, data = activity_data, FUN = median)
+activity_data_noNAs[is.na(activity_data$steps),1]=MedianStepsByInterval[which(AverageStepsByInterval$'interval' == activity_data[is.na(activity_data$steps),3]),2]
+
+noNA_TotalStepsPerDay = aggregate(steps ~ date, activity_data_noNAs, FUN = sum)
+hist(noNA_TotalStepsPerDay$steps,main ='Histogram #2 of steps per day', xlab = 'Steps per day')
+
+
+```
+
+Our new median is `r format(median (noNA_TotalStepsPerDay$steps),scientific=F)` and mean is `r format(mean (noNA_TotalStepsPerDay$steps), scientific=F)`. Unlike the raw unmodified dataset, our median and mean are further apart, and lower. 
+
+## Differences in activity between weekdays and weekend
+
+
+```{r, echo = FALSE}
+Sys.setenv(TZ="Europe/Berlin")
+activity_data_noNAs$dayType = 'weekday'
+activity_data_noNAs[is.weekend(activity_data_noNAs$date),4] = 'weekend'
+meanStepsDailyByDayType = aggregate(steps ~ interval + dayType, data = activity_data_noNAs,FUN=mean)
+
+par(mfrow = c(2,1) )
+#plot(meanStepsDailyByDayType[which(meanStepsDailyByDayType$dayType == 'weekday'),], )
+plot(meanStepsDailyByDayType[which(meanStepsDailyByDayType$dayType == 'weekday'),]$interval, meanStepsDailyByDayType[which(meanStepsDailyByDayType$dayType == 'weekday'),]$steps, type="l", xlab = '24hour time', ylab = 'steps taken', main = 'Average steps taken during a weekday')
+plot(meanStepsDailyByDayType[which(meanStepsDailyByDayType$dayType == 'weekend'),]$interval, meanStepsDailyByDayType[which(meanStepsDailyByDayType$dayType == 'weekend'),]$steps, type="l", xlab = '24hour time', ylab = 'steps taken', main = 'Average steps taken during a weekend')
+```
+
+
+
+
+
+
+
+So in these recordings, people on weekends start moving later but on average seem to move more.
