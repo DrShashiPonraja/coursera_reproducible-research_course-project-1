@@ -4,8 +4,8 @@ author: "Shashi Ponraja"
 date: "17/03/2018"
 output: md_document
 ---
-
-```{r setup, include=FALSE}
+Files and libraries used
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 source ('import_data.R')
 library(chron)

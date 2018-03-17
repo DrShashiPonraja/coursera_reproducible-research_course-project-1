@@ -1,3 +1,13 @@
+Files and libraries used
+
+    knitr::opts_chunk$set(echo = TRUE)
+    source ('import_data.R')
+    library(chron)
+
+    ## Warning: package 'chron' was built under R version 3.4.3
+
+    library (ggplot2)
+
 This is an analysis of steps taken throughout the day, separated by 5
 minute time intervals. It was collected between 2012-10-01 and
 2012-11-30
