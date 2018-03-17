@@ -2,7 +2,7 @@
 title: "Reproducible Research Project 1"
 author: "Shashi Ponraja"
 date: "17/03/2018"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
